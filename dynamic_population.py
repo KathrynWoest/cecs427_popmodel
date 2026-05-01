@@ -47,11 +47,11 @@ def main():
 
     # call the interactive function
     if "--interactive" in args:
-        interactive.interactive(user_graph, track)
+        interactive.interactive(user_graph, track, action)
 
 
     # call the plotting function
     if "--plot" in args:
-        plot.plot(user_graph, track)
+        plot.plot(user_graph, track, action)
 
 main()
