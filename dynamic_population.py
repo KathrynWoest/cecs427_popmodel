@@ -3,9 +3,9 @@
 import sys
 import file_i
 import cascade
-import covid
-import plot
-import interactive
+#import covid
+#import plot
+#import interactive
 
 
 def main():
@@ -18,7 +18,7 @@ def main():
 
     if "--action" in args:
         user_graph = file_i.parse_graph(args[1])
-        action = args[2]
+        action = args[args.index("--action") + 1]
         if action not in ["cascade", "covid"]:
             raise Exception(f"Program was terminated because the action provided was not 'cascade' or 'covid'. Action provided:", action)
     else:
@@ -31,7 +31,7 @@ def main():
         threshold   =  args[args.index("--threshold") + 1]             if "--threshold" in args  else 0.5
         
         # call the cascade analysis
-        track = cascade.cascade(initiators, threshold)
+        track = cascade.cascade(user_graph, initiators, threshold)
 
     else:
         # initialize covid values with provided values, using defaults of 0.2, 20, and 0 if not given
@@ -42,16 +42,16 @@ def main():
         vaccination  =  args[args.index("--vaccination") + 1]               if "vaccination" in args               else 0
         
         # call the covid analysis
-        track = covid.covid(prob_infect, prob_death, lifespan, shelter, vaccination)
+        #track = covid.covid(user_graph, prob_infect, prob_death, lifespan, shelter, vaccination)
 
 
     # call the interactive function
-    if "--interactive" in args:
-        interactive.interactive(user_graph, track, action)
+    #if "--interactive" in args:
+        #interactive.interactive(user_graph, track, action)
 
 
     # call the plotting function
-    if "--plot" in args:
-        plot.plot(user_graph, track, action)
+    #if "--plot" in args:
+        #plot.plot(user_graph, track, action)
 
 main()
