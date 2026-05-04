@@ -18,7 +18,13 @@ def parse_graph(file_name):
         if submitted_graph.number_of_nodes() == 0 or submitted_graph.number_of_edges() == 0:
             raise Exception("Program terminated because the graph has no nodes and/or no edges.")
         
-        return submitted_graph
+        # determines if graph is directed; must be directed for covid but can be undirected for cascade
+        if submitted_graph.is_directed():
+            directed = True
+        else:
+            directed = False
+        
+        return submitted_graph, directed
     
     except Exception as e:
         raise Exception("Program quit due to an error in reading and parsing the graph from the provided .gml file. Provided error:", e)
