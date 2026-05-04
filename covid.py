@@ -45,7 +45,7 @@ def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccina
         # save the initial graph, where just the initiators adopted
         tracker.append(copy.deepcopy(new_graph))
 
-        for i in lifespan:
+        for i in range(lifespan):
             last_step_graph = copy.deepcopy(new_graph)
             
             # for every node in the graph, get its neighbors
@@ -70,31 +70,57 @@ def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccina
                         
                         # TODO: add checks for vaccinated and sheltered
                         
-                        if random.random() <= prob_infect:
+                        # check to see if the neighbor got infected, and if it did, set its attributes
+                        if random.random() < prob_infect:
                             new_graph.nodes[neighbor]["state"] = "I"
                             new_graph.nodes[neighbor]["I_count"] = T_INFECT
 
-                        # check if node died
-                        # check if node recovered
+                    # check to see if the node died at the end of the step
+                    if random.random() < prob_death:
+                        new_graph.nodes[node]["state"] = "D"
+                        new_graph.nodes[node]["I_count"] = 0
+
+                    # if they didn't die, decrement their infected count and determine if they recovered
+                    else:
+                        new_graph.nodes[node]["I_count"] -= 1
+
+                        if new_graph.nodes[node]["I_count"] < 1:
+                            new_graph.nodes[node]["state"] = "R"
+                            new_graph.nodes[node]["R_count"] = T_RECOVER
 
             # save the current state of the graph for interactive/plot
             tracker.append(copy.deepcopy(new_graph))
 
         # determine the final state of the graph
-        adopters = []
+        susceptible = []
+        infected = []
+        recovering = []
+        dead = []
         for node in new_graph:
-            if new_graph.nodes[node]["adopt"]:
-                adopters.append(node)
+            if new_graph.nodes[node]["state"] == "S":
+                susceptible.append(node)
+            elif new_graph.nodes[node]["state"] == "I":
+                infected.append(node)
+            elif new_graph.nodes[node]["state"] == "R":
+                recovering.append(node)
+            else:
+                dead.append(node)
 
         # print results
-        print("\n-----Cascade-----")
+        print("\n-----Covid-----")
         print("Initial nodes:", initiators)
-        print("Threshold:", threshold)
-        print("\nAll adopters:", adopters)
-        print(f"Percentage of nodes in the graph that ultimately adopted: {(len(adopters) / len(list(new_graph.nodes())) * 100):.2f}%")
+        print("Probability of infection:", prob_infect)
+        print("Probability of death:", prob_death)
+        print("Probability of sheltered:", shelter)
+        print("Probability of vaccinated:", vaccination)
+        print("\nFinal State:")
+        print("Susceptible:", susceptible)
+        print("Infected:", infected)
+        print("Recovering:", recovering)
+        print("Dead:", dead)
     
     except Exception as e:
-        raise Exception("Program terminated due to a failure in cascade calculation:", e)
+        raise Exception("Program terminated due to a failure in covid calculation:", e)
 
     # return the tracked states
     return tracker

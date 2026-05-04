@@ -41,11 +41,11 @@ def main():
             raise Exception("Program terminated because graph is undirected. For the covid simulation, the graph must be directed.")
         
         # initialize covid values with provided values, using defaults of 0.2, 20, and 0 if not given
-        prob_infect  =  args[args.index("--probability_of_infection") + 1]  if "probability_of_infection" in args  else 0.2
-        prob_death   =  args[args.index("--probability_of_death") + 1]      if "probability_of_death" in args      else 0
-        lifespan     =  args[args.index("--lifespan") + 1]                  if "lifespan" in args                  else 20
-        shelter      =  args[args.index("--shelter") + 1]                   if "shelter" in args                   else 0
-        vaccination  =  args[args.index("--vaccination") + 1]               if "vaccination" in args               else 0
+        prob_infect  =  args[args.index("--probability_of_infection") + 1]  if "--probability_of_infection" in args  else 0.2
+        prob_death   =  args[args.index("--probability_of_death") + 1]      if "--probability_of_death" in args      else 0
+        lifespan     =  args[args.index("--lifespan") + 1]                  if "--lifespan" in args                  else 20
+        shelter      =  args[args.index("--shelter") + 1]                   if "--shelter" in args                   else 0
+        vaccination  =  args[args.index("--vaccination") + 1]               if "--vaccination" in args               else 0
         
         # call the covid analysis
         track = covid.covid(user_graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccination)
