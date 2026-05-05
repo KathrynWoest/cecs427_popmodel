@@ -1,6 +1,7 @@
 import networkx as nx
 import copy
 import random
+import numpy
 
 
 def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccination):
@@ -24,16 +25,17 @@ def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccina
         if initiator not in graph:
             raise Exception(f"Program terminated due to a failure in cascade calculation: node {initiator} does not exist in the given graph.")
 
-    try:
+    try:        
         tracker = []
         new_graph = copy.deepcopy(graph)
         T_INFECT = 2
         T_RECOVER = 2
 
+
         # initialize all attributes and initiators
         nx.set_node_attributes(new_graph, "S", name="state")  # S (susceptible), I (infected), R (recovering), D (dead)
         nx.set_node_attributes(new_graph, False, name="initiator")
-        nx.set_node_attributes(new_graph, "none", name="protection")  # none, shelter, vaccine
+        nx.set_node_attributes(new_graph, False, name="vaccinated")
         nx.set_node_attributes(new_graph, 0, name="I_count")
         nx.set_node_attributes(new_graph, 0, name="R_count")
         
@@ -42,9 +44,45 @@ def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccina
             new_graph.nodes[node]["initiator"] = True
             new_graph.nodes[node]["I_count"] = T_INFECT
         
+
+        # determine which nodes are vaccinated (can include initiators and sheltered nodes)
+        nodes = list(new_graph.nodes())
+        node_count = int(numpy.ceil(len(nodes) * vaccination))
+        rand_indices = []
+
+        # for the number of nodes that must be vaccinated per the vaccination input
+        for i in range(node_count):
+            rand_node_index = random.randint(0, len(nodes) - 1)
+
+            # keep randomly selecting nodes until the selected node hasn't been picked yet
+            while rand_node_index in rand_indices:
+                rand_node_index = random.randint(0, len(nodes) - 1)
+        
+            # set the node's protection to vaccinated
+            rand_indices.append(rand_node_index)
+            new_graph.nodes[nodes[rand_node_index]]["vaccinated"] = True
+        
+
+        # determine which edges to remove to indicate sheltered nodes, using the same process as for vaccinated nodes
+        edges = list(new_graph.edges())
+        edge_count = int(numpy.ceil(len(edges) * shelter))
+        rand_indices = []
+
+        for i in range(edge_count):
+            rand_edge_index = random.randint(0, len(edges) - 1)
+
+            while rand_edge_index in rand_indices:
+                rand_edge_index = random.randint(0, len(edges) - 1)
+            
+            rand_indices.append(rand_edge_index)
+            new_graph.remove_edge(*edges[rand_edge_index])
+        
+
         # save the initial graph, where just the initiators adopted
         tracker.append(copy.deepcopy(new_graph))
 
+
+        # begin the analysis
         for i in range(lifespan):
             last_step_graph = copy.deepcopy(new_graph)
             
@@ -60,6 +98,7 @@ def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccina
                     if new_graph.nodes[node]["R_count"] < 1:
                         new_graph.nodes[node]["state"] = "S"
 
+                # if the node is infected, calculate effects on neighbors
                 elif last_step_graph.nodes[node]["state"] == "I":
                     neighbors = list(last_step_graph.successors(node))
 
@@ -68,10 +107,14 @@ def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccina
                         if last_step_graph.nodes[neighbor]["state"] in ["I", "R", "D"]:
                             continue
                         
-                        # TODO: add checks for vaccinated and sheltered
-                        
+                        # if the node is vaccinated, make the chances of being infected significantly lower
+                        if last_step_graph.nodes[neighbor]["vaccinated"]:
+                            if random.random() < (prob_infect * vaccination):
+                                new_graph.nodes[neighbor]["state"] = "I"
+                                new_graph.nodes[neighbor]["I_count"] = T_INFECT
+                                                
                         # check to see if the neighbor got infected, and if it did, set its attributes
-                        if random.random() < prob_infect:
+                        elif random.random() < prob_infect:
                             new_graph.nodes[neighbor]["state"] = "I"
                             new_graph.nodes[neighbor]["I_count"] = T_INFECT
 
@@ -80,7 +123,7 @@ def covid(graph, initiators, prob_infect, prob_death, lifespan, shelter, vaccina
                         new_graph.nodes[node]["state"] = "D"
                         new_graph.nodes[node]["I_count"] = 0
 
-                    # if they didn't die, decrement their infected count and determine if they recovered
+                    # if it didn't die, decrement its infected count and determine if it recovered
                     else:
                         new_graph.nodes[node]["I_count"] -= 1
 
