@@ -29,12 +29,12 @@ def show_interactive(user_graph, track, mode):
         node_colors = []
         for node, attrs in G_step.nodes(data=True):
             if mode == 'cascade':
-                node_colors.append('orange' if attrs.get('adopt') == 'yes' else 'skyblue')
+                node_colors.append('orange' if attrs.get('adopt') == True else 'skyblue')
             else: # covid mode
                 stage = attrs.get('stage', 'susceptible')
-                if stage == 'infected': node_colors.append('red')
-                elif stage == 'recovery': node_colors.append('green')
-                elif stage == 'dead': node_colors.append('black')
+                if stage == 'I': node_colors.append('red')
+                elif stage == 'R': node_colors.append('green')
+                elif stage == 'D': node_colors.append('black')
                 elif attrs.get('vaccinated'): node_colors.append('blue')
                 elif attrs.get('sheltered'): node_colors.append('gray')
                 else: node_colors.append('skyblue')
