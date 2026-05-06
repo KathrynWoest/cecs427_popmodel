@@ -24,15 +24,15 @@ def plot(user_graph, track, action):
             if action == 'cascade':
                 count = sum(1 for n, d in track[i].nodes(data=True) if d.get('adopt') == True)
             else:
-                count = sum(1 for n, d in track[i].nodes(data=True) if d.get('stage') == 'I')
+                count = sum(1 for n, d in track[i].nodes(data=True) if d.get('state') == 'I')
         else:
             # Compare current step to previous step to find 'NEW' occurrences
             if action == 'cascade':
                 prev_nodes = {n for n, d in track[i-1].nodes(data=True) if d.get('adopt') == True}
                 curr_nodes = {n for n, d in track[i].nodes(data=True) if d.get('adopt') == True}
             else:
-                prev_nodes = {n for n, d in track[i-1].nodes(data=True) if d.get('stage') == 'I'}
-                curr_nodes = {n for n, d in track[i].nodes(data=True) if d.get('stage') == 'I'}
+                prev_nodes = {n for n, d in track[i-1].nodes(data=True) if d.get('state') == 'I'}
+                curr_nodes = {n for n, d in track[i].nodes(data=True) if d.get('state') == 'I'}
             
             # New = (nodes infected now) MINUS (nodes that were already infected)
             count = len(curr_nodes - prev_nodes)
