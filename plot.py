@@ -26,7 +26,7 @@ def plot(user_graph, track, action):
             else:
                 count = sum(1 for n, d in track[i].nodes(data=True) if d.get('state') == 'I')
         else:
-            # Compare current step to previous step to find 'NEW' occurrences
+            # Compare current step to previous step to find new occurrences
             if action == 'cascade':
                 prev_nodes = {n for n, d in track[i-1].nodes(data=True) if d.get('adopt') == True}
                 curr_nodes = {n for n, d in track[i].nodes(data=True) if d.get('adopt') == True}
@@ -34,7 +34,7 @@ def plot(user_graph, track, action):
                 prev_nodes = {n for n, d in track[i-1].nodes(data=True) if d.get('state') == 'I'}
                 curr_nodes = {n for n, d in track[i].nodes(data=True) if d.get('state') == 'I'}
             
-            # New = (nodes infected now) MINUS (nodes that were already infected)
+            # New = (nodes infected now) - (nodes that were already infected)
             count = len(curr_nodes - prev_nodes)
         
         new_counts.append(count)
