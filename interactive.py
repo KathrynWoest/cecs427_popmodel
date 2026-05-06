@@ -31,7 +31,7 @@ def show_interactive(user_graph, track, mode):
             if mode == 'cascade':
                 node_colors.append('orange' if attrs.get('adopt') == True else 'skyblue')
             else: # covid mode
-                stage = attrs.get('stage', 'susceptible')
+                stage = attrs.get('stage', 'S')
                 if stage == 'I': node_colors.append('red')
                 elif stage == 'R': node_colors.append('green')
                 elif stage == 'D': node_colors.append('black')
