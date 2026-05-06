@@ -1,33 +1,54 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider
 
-def interactive(G, round_num, mode='cascade'):
+def show_interactive(user_graph, track, mode):
     """
-    Plots the graph and the state of the nodes for a single round.
+    Plots the graph and the state of the nodes for every round in the simulation.
 
     Parameters:
-        G (NetworkX.Graph): the original graph
-        round_num (int): the current round number being visualized
+        user_graph (NetworkX.Graph): the original graph
+        track ([NetworkX.Graph]): a list of graphs containing the resulting graphs after every round
         mode (string): the graph's mode (either 'cascade' or 'covid')
     """
-    
-    plt.figure(figsize=(8, 6))
-    plt.title(f"Interactive View: {mode.capitalize()} - Round {round_num}")
-    
-    # Consistent layout
-    pos = nx.spring_layout(G, seed=42)
-    node_colors = []
-    
-    for node, attrs in G.nodes(data=True):
-        if mode == 'cascade':
-            node_colors.append('orange' if attrs.get('adopt') == 'yes' else 'skyblue')
-        else: # covid mode
-            stage = attrs.get('stage', 'susceptible')
-            if stage == 'infected': node_colors.append('red')
-            elif stage == 'recovery': node_colors.append('green')
-            elif attrs.get('vaccinated'): node_colors.append('blue')
-            elif attrs.get('sheltered'): node_colors.append('gray')
-            else: node_colors.append('skyblue')
 
-    nx.draw(G, pos, with_labels=True, node_color=node_colors, node_size=500, edge_color='silver')
+    fig, ax = plt.subplots(figsize=(10, 8))
+    plt.subplots_adjust(bottom=0.2) # Make room for the slider
+    
+    pos = nx.spring_layout(user_graph, seed=42)
+    
+    # Setup the slider
+    ax_slider = plt.axes([0.2, 0.05, 0.6, 0.03])
+    slider = Slider(ax_slider, 'Round', 0, len(track) - 1, valinit=0, valfmt='%d')
+
+    def update(val):
+        round_idx = int(slider.val)
+        ax.clear()
+        G_step = track[round_idx]
+        
+        node_colors = []
+        for node, attrs in G_step.nodes(data=True):
+            if mode == 'cascade':
+                node_colors.append('orange' if attrs.get('adopt') == 'yes' else 'skyblue')
+            else: # covid mode
+                stage = attrs.get('stage', 'susceptible')
+                if stage == 'infected': node_colors.append('red')
+                elif stage == 'recovery': node_colors.append('green')
+                elif stage == 'dead': node_colors.append('black')
+                elif attrs.get('vaccinated'): node_colors.append('blue')
+                elif attrs.get('sheltered'): node_colors.append('gray')
+                else: node_colors.append('skyblue')
+
+        ax.set_title(f"Interactive View: {mode.capitalize()} - Round {round_idx}")
+        nx.draw(G_step, pos, ax=ax, with_labels=True, node_color=node_colors, 
+                node_size=500, edge_color='silver')
+        
+        # Re-add legend (Matplotlib clears it on ax.clear())
+        labels = {'Infected/Adopted': 'red' if mode=='covid' else 'orange', 'Susceptible': 'skyblue'}
+        handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=c, label=l) for l, c in labels.items()]
+        ax.legend(handles=handles, loc='upper right')
+        fig.canvas.draw_idle()
+
+    slider.on_changed(update)
+    update(0) # Initial draw
     plt.show()
