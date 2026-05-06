@@ -43,7 +43,7 @@ def show_interactive(user_graph, track, mode):
                 node_size=500, edge_color='silver')
         
         # Re-add legend (Matplotlib clears it on ax.clear())
-        labels = {'Infected/Adopted': 'red' if mode=='covid' else 'orange', 'Susceptible': 'skyblue'}
+        labels = {'Infected/Adopted': 'red' if mode=='covid' else 'orange', 'Susceptible': 'skyblue', 'Recovering': 'green', 'Dead': 'black', 'Vaccinated': 'blue'}
         handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=c, label=l) for l, c in labels.items()]
         ax.legend(handles=handles, loc='upper right')
         fig.canvas.draw_idle()
