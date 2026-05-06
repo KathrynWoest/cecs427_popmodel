@@ -3,7 +3,10 @@ import copy
 
 
 def cascade(graph, initiators, threshold):
-    threshold = float(threshold)
+    try:
+        threshold = float(threshold)
+    except Exception as e:
+        raise Exception(f"Program terminated due to a failure in cascade calculation: threshold {threshold }is not a number.")
 
     if threshold < 0 or threshold > 1:
         raise Exception(f"Program terminated due to a failure in cascade calculation: threshold {threshold} is not between 0 and 1.")
