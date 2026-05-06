@@ -4,8 +4,8 @@ import sys
 import file_i
 import cascade
 import covid
-#import plot
-#import interactive
+import plot
+import interactive
 
 
 def main():
@@ -52,12 +52,12 @@ def main():
 
 
     # call the interactive function
-    #if "--interactive" in args:
-        #interactive.interactive(user_graph, track, action)
+    if "--interactive" in args:
+        interactive.show_interactive(user_graph, track, action)
 
 
     # call the plotting function
-    #if "--plot" in args:
-        #plot.plot(user_graph, track, action)
+    if "--plot" in args:
+        plot.plot(user_graph, track, action)
 
 main()
