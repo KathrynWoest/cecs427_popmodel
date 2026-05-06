@@ -32,4 +32,4 @@ Completed By: Kathryn Woest (030131541) and Grace Flores (030169163)
 2. Command: `python3 dynamic_population.py cascadebehaviour.gml --action covid --interactive`
 3. Command: `python3 dynamic_population.py cascadebehaviour.gml --action covid --initiator 1,5,6 --probability_of_infection 0.5 --probability_of_death 0.2 --lifespan 5 --shelter 0.1 --vaccination 0.3`
 
-Outputs for all are annotated in this PDF: 
+Outputs for all are annotated in this PDF: https://pdflink.to/f57818e3/
